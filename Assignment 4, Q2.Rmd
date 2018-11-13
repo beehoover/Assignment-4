@@ -1,0 +1,99 @@
+---
+title: "Assignment 4 Q2"
+author: "Barbara Rose Hoover"
+date: "11/12/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(kableExtra) 
+library(knitr)
+library(ggplot2)
+library(magrittr)
+library(ggpubr)
+library(cowplot)
+library(dplyr)
+library(effsize) 
+library(vcdExtra)
+```
+
+
+#2.Compare Mean Lobster Size in 2017
+
+```{r}
+setwd("~/Desktop/BREN/ESM 206/Fall 2018/Assignments/Assignment 4")
+library(readr)
+lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
+
+lb_size_2 <- lobster_size_abundance %>%
+  filter(SITE == "AQUE" | SITE == "CARP" | SITE == "IVEE" | SITE == "MOHK" | SITE == "NAPL", YEAR == "2017",  COUNT != "0") %>%
+  select(YEAR,SITE,SIZE,COUNT) 
+
+
+
+sz_expand_2 <- lb_size_2[rep(1:nrow(lb_size_2), lb_size_2[["COUNT"]]), ]
+sz_expand_2$SITE<-as.factor(sz_expand_2$SITE)
+sz_expand_2
+
+```
+
+
+###Null hypothesis: the means of the different groups are the same
+###Alternative hypothesis: At least one sample mean is not equal to the others.
+```{r}
+lb_sz_2 <- sz_expand_2 %>% 
+  group_by(SITE) %>%
+  summarize(count = n(), mean = mean(SIZE), sd = sd(SIZE))
+lb_sz_2
+```
+
+```{r data visualization}
+sz_bplot_2<-ggboxplot(sz_expand_2, x = "SITE", y = "SIZE", 
+          color = "SITE", palette = get_palette(c("#00AFBB", "#E7B800", "#FC4E07"), 5),
+          order = c("AQUE", "CARP", "IVEE", "MOHK", "NAPL"),
+          ylab = "SIZE", xlab = "SITE")
+sz_bplot_2
+```
+
+```{r}
+sz_hst_2<-gghistogram(sz_expand_2, x = "SIZE",
+   add = "mean", rug = TRUE,
+   color = "SITE", fill = "SITE",
+   palette = get_palette(c("#00AFBB", "#E7B800", "#FC4E07"), 5),
+   xlab = 'Lobster Size')
+sz_hst_2
+```
+
+
+```{r}
+sz_line_2 <- ggline(sz_expand_2, x = "SITE", y = "SIZE",
+       add = c("mean_se", "jitter"), 
+       order = c("AQUE", "CARP", "IVEE", "MOHK", "NAPL"),
+       ylab = "SIZE", xlab = "SITE")
+sz_line_2
+```
+
+##One Way Anova
+###As the p-value is less than the significance level 0.05, we can conclude that there are significant differences between the groups highlighted with “*" in the model summary.
+```{r one way anova}
+lb.aov <- aov(SIZE ~ SITE, data = sz_expand_2)
+summary(lb.aov)
+```
+###As the ANOVA test is significant, we can compute Tukey HSD (Tukey Honest Significant Differences, R function: TukeyHSD()) for performing multiple pairwise-comparison between the means of groups.
+
+####The function TukeyHD() takes the fitted ANOVA as an argument.
+```{r}
+TukeyHSD(lb.aov)
+```
+###It can be seen from the output, that only the difference between NAPL-IVEE and NAPL-CARP is significant with an adjusted p-value of 0.0037001 & 0.0228728 respectively.  
+
+NAPL-IVEE  4.7799976  1.09751057 8.462485 0.0037001  
+
+NAPL-CARP  4.0023556  0.36042398 7.644287 0.0228728 
+
