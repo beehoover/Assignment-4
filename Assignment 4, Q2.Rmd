@@ -27,8 +27,6 @@ library(vcdExtra)
 #2.Compare Mean Lobster Size in 2017
 
 ```{r}
-setwd("~/Desktop/BREN/ESM 206/Fall 2018/Assignments/Assignment 4")
-library(readr)
 lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
 
 lb_size_2 <- lobster_size_abundance %>%
