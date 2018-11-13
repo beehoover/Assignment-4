@@ -28,8 +28,8 @@ library(vcdExtra)
 Describe trends in *lobster abundance (counts)* and *fishing pressure (trap buoys)* at the five locations from 2012 - 2017. Ignore transect information - we are only interested in evaluating abundance and pressure on the order of SITE. Note: you are not expected to use regression here - just think of ways to clearly describe annual totals visually and in text, noting important trends, events and differences.
 
 ```{r}
-setwd("~/Desktop/BREN/ESM 206/Fall 2018/Assignments/Assignment 4")
-library(readr)
+
+
 lobster_traps <- read_csv("lobster_traps.csv")
 lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
 ```
