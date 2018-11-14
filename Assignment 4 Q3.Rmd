@@ -27,8 +27,6 @@ library(vcdExtra)
 ###3. Changes in lobster size at MPA and non-MPA sites (comparing only 2012 and 2017 sizes)
 
 ```{r}
-setwd("~/Desktop/BREN/ESM 206/Fall 2018/Assignments/Assignment 4")
-library(readr)
 lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
 ```
 
@@ -50,9 +48,18 @@ lb_size_3 <- lobster_size_abundance %>%
 lb_size_3
 ```
 
+##Dataframe: All 5 sites expanded from Frequency to Case Format (n=1,899)
+```{r expanded for frequency}
+sz_expand_3 <- lb_size_3[rep(1:nrow(lb_size_3), lb_size_3[["COUNT"]]), ]
+sz_expand_3$SITE<-as.factor(sz_expand_3$SITE)
+sz_expand_3
+```
+
 ```{r}
-size_sum_3<-lb_size_3 %>% 
-  group_by(SITE, YEAR) %>%
+lb_size_3$YEAR <-as.factor(lb_size_3$YEAR)
+size_sum_3 <- sz_expand_3 %>% 
+  group_by(YEAR, SITE) %>% 
+
   summarize('mean' = round(mean(`SIZE`), digits=2),
             'median' = round(median(`SIZE`), digits = 2),
             'max' = max(`SIZE`),
@@ -63,20 +70,14 @@ size_sum_3<-lb_size_3 %>%
 size_sum_3
 ```
 
-##Dataframe: All 5 sites expanded from Frequency to Case Format (n=1,899)
-```{r expanded for frequency}
-sz_expand_3 <- lb_size_3[rep(1:nrow(lb_size_3), lb_size_3[["COUNT"]]), ]
-sz_expand_3$SITE<-as.factor(sz_expand_3$SITE)
-sz_expand_3
-```
 
-```{r}
+```{r nooooo}
 limits <- aes(ymax = size_sum_3$mean + size_sum_3$se,
               ymin = size_sum_3$mean - size_sum_3$se)
 
 p <- ggplot(data = size_sum_3, aes(x = factor(SITE), y = mean,
                fill = YEAR)) +
-  geom_bar(stat = "identity", position = dodge, width=0.8) +
+  geom_bar(stat = "identity", width=0.8) +
   theme_minimal()+
   geom_errorbar(limits, position = position_dodge(0.95), width = 0.25) +
   scale_color_brewer(palette="Pastel2")+
@@ -89,7 +90,7 @@ p
 
 ```
 
-```{r}
+```{r noooooo}
 ggbarplot(size_sum_3, x = "SITE", y = "mean", color = "YEAR", fill="YEAR",
           palette = c("#00AFBB", "#E7B800"), position = position_dodge(0.8), add = c("mean_se", "jitter"))
 

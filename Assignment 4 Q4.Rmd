@@ -1,0 +1,84 @@
+---
+title: "Assignment 4 Q5"
+author: "Barbara Rose Hoover"
+date: "11/13/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+4. Proportions of “legal” lobsters at the 5 sites in 2017
+-The legal minimum carapace size for lobster is 82.6 mm. What proportion of observed lobsters at each site
+are above the legal minimum? 
+-Does that proportion differ significantly across the 5 sites? Note: We’ll be
+doing chi-square in labs next week, or go ahead with maximum resourcefulness and check out the chisq.test()
+function on your own!
+
+Chi-squared test
+Are the observed proportions equal across the 5 sites
+
+```{r load library}
+library(tidyverse)
+library(kableExtra) 
+library(knitr)
+library(ggplot2)
+library(magrittr)
+library(ggpubr)
+library(cowplot)
+library(dplyr)
+library(effsize) 
+library(vcdExtra)
+```
+
+```{r}
+lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
+```
+
+```{r}
+lb_size_5 <- lobster_size_abundance %>%
+  filter(SITE == "AQUE" | SITE == "CARP" | SITE == "IVEE" | SITE == "MOHK" | SITE == "NAPL", YEAR == "2017", COUNT != "0") %>%
+  select(SITE,SIZE,COUNT) %>% 
+  group_by(SITE) %>%
+  mutate(Count.Legal = ifelse(SIZE > 82.6, "1", "0"))%>%
+  mutate(Count.Not.Legal = ifelse(SIZE < 82.6, "1", "0"))
+                                      
+
+sz_expand_5 <- lb_size_5[rep(1:nrow(lb_size_5), lb_size_5[["COUNT"]]), ]
+sz_expand_5$SITE<-as.character(sz_expand_5$SITE)
+sz_expand_5$Count.Legal<-as.integer(sz_expand_5$Count.Legal)
+sz_expand_5$Count.Not.Legal<-as.integer(sz_expand_5$Count.Not.Legal)
+
+
+sz_expand_5
+```
+```{r}
+sz_ratio_5<- sz_expand_5 %>%
+    group_by(SITE) %>% 
+    summarize ("Legal" = sum(Count.Legal), "Not Legal" = sum(Count.Not.Legal)) %>% 
+    mutate('Total' = rowSums(.[2:3])) %>% 
+    mutate(MPA = ifelse(grepl("IVEE", SITE), "Yes",
+                                      ifelse(grepl("NAPL", SITE), "Yes", "No")))
+
+sz_ratio_5$'Total'<-as.integer(sz_ratio_5$'Total')
+
+sz_percent_5 <- mutate(sz_ratio_5, Percent.Legal = (Legal/Total)*100)
+
+sz_percent_5
+```
+
+```{r}
+sz_chi_5<-sz_percent_5%>% 
+  select(SITE, Legal, `Not Legal`)
+
+
+row.names(sz_chi_5) <- sz_chi_5$SITE
+sz_chi_5[1] <- NULL
+
+
+sz_chi_5 <- chisq.test(sz_chi_5)
+sz_chi_5
+sz_chi_5$observed
+round(sz_chi_5$expected,2)
+round(sz_chi_5$residuals, 3)
+```
