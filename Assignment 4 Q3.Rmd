@@ -8,7 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+###3. Describe Lobster Abundance and Fishing Pressure (2012-2017)
+####At Isla Vista and Naples Reef, the two protected MPA sites (with zero fishing pressure), how do lobster sizes in 2012 and 2017 compare? At the non-MPA sites?  
 
 ```{r include=FALSE}
 library(tidyverse)
@@ -21,83 +22,49 @@ library(cowplot)
 library(dplyr)
 library(effsize) 
 library(vcdExtra)
+library(tadaatoolbox)
 ```
-
-
-###3. Changes in lobster size at MPA and non-MPA sites (comparing only 2012 and 2017 sizes)
-
-```{r}
+####Read in Data
+```{r Read in data, echo=FALSE}
 lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
 ```
 
-#3.Describe Lobster Abundance and Fishing Pressure (2012-2017)
-##At Isla Vista and Naples Reef, the two protected MPA sites (with zero fishing pressure), how do lobster sizes in 2012 and 2017 compare? At the non-MPA sites?
 
-##Dataset to include lobster count by year and site for selected years
-###SITE "AQUE" "CARP" "IVEE" "MOHK" "NAPL"
-###YEAR (2012 & 2017)
-###MPA Designated (Yes, No)
-```{r}
-library(plyr)
+
+###Data.frame: All 5 sites in Frequency Format  
+  - SITE  
+      - "AQUE" "CARP" "IVEE" "MOHK" "NAPL"
+  - YEAR  
+      - 2012, 2017  
+  - MPA  
+      - Designated (Yes, No) 
+
+Table to include only head of table (out of 1074 observations)
+```{r echo=FALSE}
 lb_size_3 <- lobster_size_abundance %>%
   filter(SITE == "AQUE" | SITE == "CARP" | SITE == "IVEE" | SITE == "MOHK" | SITE == "NAPL", YEAR == "2017" | YEAR == "2012",  COUNT != "0") %>%
   select(YEAR,SITE,SIZE,COUNT) %>% 
   group_by(SITE, YEAR) %>%
   mutate(MPA = ifelse(grepl("IVEE", SITE), "Yes",
                                       ifelse(grepl("NAPL", SITE), "Yes", "No")))
-lb_size_3
+head1<-head(lb_size_3)
+head1%>%
+  kable() %>%
+  kable_styling()
 ```
 
-##Dataframe: All 5 sites expanded from Frequency to Case Format (n=1,899)
-```{r expanded for frequency}
+###Data.frame: All 5 sites expanded from Frequency to Case Format (n=1,899)
+```{r expanded for frequency, echo=FALSE}
 sz_expand_3 <- lb_size_3[rep(1:nrow(lb_size_3), lb_size_3[["COUNT"]]), ]
-sz_expand_3$SITE<-as.factor(sz_expand_3$SITE)
-sz_expand_3
+##sz_expand_3$SITE<-as.factor(sz_expand_3$SITE)
+head2<-head(sz_expand_3)
+head2%>%
+  kable() %>%
+  kable_styling()
 ```
-
-```{r}
-lb_size_3$YEAR <-as.factor(lb_size_3$YEAR)
-size_sum_3 <- sz_expand_3 %>% 
-  group_by(YEAR, SITE) %>% 
-
-  summarize('mean' = round(mean(`SIZE`), digits=2),
-            'median' = round(median(`SIZE`), digits = 2),
-            'max' = max(`SIZE`),
-            'SD' = round(sd(`SIZE`),digits=2), 
-            'n' = sum(`COUNT`),
-            'se' = round(sd(`SIZE`)/sqrt(length(`SIZE`)), digits = 2))
-
-size_sum_3
-```
-
-
-```{r nooooo}
-limits <- aes(ymax = size_sum_3$mean + size_sum_3$se,
-              ymin = size_sum_3$mean - size_sum_3$se)
-
-p <- ggplot(data = size_sum_3, aes(x = factor(SITE), y = mean,
-               fill = YEAR)) +
-  geom_bar(stat = "identity", width=0.8) +
-  theme_minimal()+
-  geom_errorbar(limits, position = position_dodge(0.95), width = 0.25) +
-  scale_color_brewer(palette="Pastel2")+
-  scale_fill_discrete(name = "Year")+
-  labs(x = "Site", y = "Mean Lobster Size") +
-  ggtitle("Mean Lobster Size by Site and Year\n2012, 2017" )
-  
-  
-p
-
-```
-
-```{r noooooo}
-ggbarplot(size_sum_3, x = "SITE", y = "mean", color = "YEAR", fill="YEAR",
-          palette = c("#00AFBB", "#E7B800"), position = position_dodge(0.8), add = c("mean_se", "jitter"))
-
-```
-
-
-```{r}
+***
+###Box Plot 
+```{r size box plot inclusive, echo=FALSE}
 sz_expand_3$YEAR <- factor(sz_expand_3$YEAR, 
                   levels = c(2012, 2017))
 
@@ -106,67 +73,297 @@ b<-ggboxplot(sz_expand_3, x = "SITE", y = "SIZE", color = "YEAR",
 b
 ```
 
-##SITE: MPA sites 
-##YEAR: 2012 and 2017
-##SIZE: EXPANDED 
-```{r }
-mpa_sz_3 <- sz_expand_3 %>% 
-  filter(MPA == "Yes") %>% 
-  select(YEAR, SITE, SIZE)
-mpa_sz_3 
+***  
+
+###Summary Table  
+  - All Sites  
+  - Years 2012, 2017
+```{r summary table of the years 2012 2017, echo=FALSE}
+##detach(package:plyr)
+##lb_size_3$YEAR <-as.factor(lb_size_3$YEAR)
+size_sum_3 <- sz_expand_3 %>% 
+  group_by(YEAR, SITE) %>% 
+  summarize('mean' = round(mean(`SIZE`), digits=2),
+            'median' = round(median(`SIZE`), digits = 2),
+            'max' = max(`SIZE`),
+            'SD' = round(sd(`SIZE`),digits=2), 
+            'n' = sum(`COUNT`),
+            'se' = round(sd(`SIZE`)/sqrt(length(`SIZE`)), digits = 2)) %>% 
+  arrange(SITE)
+
+size_sum_3%>%
+  kable() %>%
+  kable_styling()
+```
+***
+##IVEE (MPA)  
+
+
+####Visual Data  
+
+```{r IVEE qq plot for visual inspection, echo=FALSE}
+ivee_2012_3 <- sz_expand_3 %>% 
+  filter(SITE == "IVEE", YEAR == 2012) %>% 
+  ungroup() %>% 
+  select(SIZE)
+
+ivee_2017_3 <- sz_expand_3 %>% 
+  filter(SITE == "IVEE", YEAR == 2017) %>% 
+  ungroup() %>% 
+  select(SIZE)
 ```
 
-```{r}
-mpa_sz_bplot<-ggboxplot(mpa_sz_3, x = "YEAR", y = "SIZE", 
-          color = "YEAR", palette = c("#00AFBB", "#E7B800"),
-        ylab = "SIZE", xlab = "YEAR")+
-  labs(title = "Lobster SIZE")
-mpa_sz_bplot
+<div class = "row">
+<div class = "col-md-6">
+2012
+```{r echo=FALSE}
+ggqqplot(ivee_2012_3$SIZE)
+```
+</div>
+<div class = "col-md-6">
+2017
+```{r echo=FALSE}
+ggqqplot(ivee_2017_3$SIZE)
+```
+</div>
+</div>
+
+####F test for variance  
+
+```{r IVEE variance test, echo=FALSE}
+ivee_var_3<-var.test(ivee_2012_3$SIZE, ivee_2017_3$SIZE)
+ivee_var_3
+```
+RESULT:  
+p-value for the variance test, (`r ivee_var_3$p.value`) is larger than the significance level $\alpha$ = 0.05. There is not a significant difference between the variances of the two sets of data. We will need to use student's t-test, which is designed for equal variances, and the assumption of normality.  
+
+####Shapiro-Wilk normality test  
+2012 sample size is <30 (n=28) 
+```{r IVEE shapiro test for normality, echo=FALSE}
+ivee_sw_3<-shapiro.test(ivee_2012_3$SIZE)
+ivee_sw_3
+```
+p-value = 0.0003044
+
+RESULT:  
+From the output, the p-value (`r ivee_sw_3$p.value`) < 0.05 implying that the distribution of the data are significantly different from normal distribution. In other words, we cannot assume the normality, and will have to use Welch's t-test. 
+
+#### T-test
+```{r ivee t test, echo=FALSE }
+ivee_t_3 <- t.test(ivee_2012_3$SIZE, ivee_2017_3$SIZE) 
+ivee_t_3
+```
+RESULT:  
+Mean Lobster Sizes differ significantly between the 2012 and 2017 at IVEE at the 0.05 confidence level. (t(`r round(ivee_t_3$parameter, 2)`) = `r round(ivee_t_3$statistic, 2)`, *p* = `r ivee_t_3$p.value`).
+
+
+***
+##NAPL (MPA)
+#####Visual data
+
+```{r NAPL visual data inspection, echo=FALSE}
+napl_2012_3 <- sz_expand_3 %>% 
+  filter(SITE == "NAPL", YEAR == 2012) %>% 
+  ungroup() %>% 
+  select(SIZE)
+
+napl_2017_3 <- sz_expand_3 %>% 
+  filter(SITE == "NAPL", YEAR == 2017) %>% 
+  ungroup() %>% 
+  select(SIZE)
 ```
 
-##NAPL Size Comparison 
-```{r napl comparison}
-npl_sz <- sz_expand_3 %>% 
-  filter(SITE == "NAPL") %>% 
-  select(YEAR, SITE, SIZE)
-npl_sz 
+<div class = "row">
+<div class = "col-md-6">
+2012
+```{r, echo=FALSE}
+ggqqplot(napl_2012_3$SIZE)
+```
+</div>
 
-npl_sz_bplot<-ggboxplot(npl_sz, x = "YEAR", y = "SIZE", 
-          color = "YEAR", palette = c("#00AFBB", "#E7B800"),
-        ylab = "SIZE", xlab = "YEAR")+
-  labs(title = "NAPL Lobster SIZE")
-npl_sz_bplot
+<div class = "col-md-6">
+2017
+```{r, echo=FALSE}
+ggqqplot(napl_2017_3$SIZE)
+```
+</div>
+</div>  
+
+####Shapiro-Wilk’s test for normality (n<30) 
+NAPL 2012 sample size is <30 (n=8)
+```{r shapiro test for normality, echo=FALSE}
+napl_sw_3<-shapiro.test(napl_2012_3$SIZE)
+napl_sw_3
+```
+p-value = 0.5209
+
+RESULT:  
+From the output, the p-value (`r napl_sw_3$p.value`) > 0.05 implying that the distribution of the data are not significantly different from normal distribution. In other words, we can assume the normality.
+
+####F test for variance
+
+```{r napl variance test, echo=FALSE}
+napl_var_3<- var.test(napl_2012_3$SIZE, napl_2017_3$SIZE)
+napl_var_3
+```
+
+RESULT:  
+p-value for the variance test, (`r napl_var_3$p.value`) is larger than the significance level $\alpha$ = 0.05. There is not a significant difference between the variances of the two sets of data. We will need to use student's t-test, which is designed for equal variances, and the assumption of normality.
+
+####T-test 
+
+```{r napl t test, echo=FALSE}
+napl_t_3 <- t.test(napl_2012_3$SIZE, napl_2017_3$SIZE, var.equal = TRUE) 
+napl_t_3
+```
+RESULT:  
+Mean Lobster Sizes do not differ significantly between the 2012 and 2017 at NAPL at the 0.05 confidence level. (t(`r round(napl_t_3$parameter, 2)`) = `r round(napl_t_3$statistic, 2)`, *p* = `r napl_t_3$p.value`).  
+
+***  
+
+##AQUE  
+
+
+```{r AQUE, echo=FALSE}
+aque_2012_3 <- sz_expand_3 %>%
+  filter(SITE == "AQUE", YEAR == 2012) %>%
+  ungroup() %>%
+  select(SIZE)
+aque_2017_3 <- sz_expand_3 %>% 
+  filter(SITE == "AQUE", YEAR == 2017) %>% 
+  ungroup() %>% 
+  select(SIZE)
+```
+
+<div class = "row">
+<div class = "col-md-6">
+2012
+```{r, echo=FALSE}
+ggqqplot(aque_2012_3$SIZE)
+```
+</div>
+<div class = "col-md-6">
+2017
+```{r, echo=FALSE}
+ggqqplot(aque_2017_3$SIZE)
+```
+</div>
+</div>
+
+####F test for variance
+
+```{r aque variance test, echo=FALSE}
+aque_var_3<- var.test(aque_2012_3$SIZE, aque_2017_3$SIZE)
+aque_var_3
+```
+
+RESULT:  
+p-value for the variance test, (`r aque_var_3$p.value`) is larger than the significance level $\alpha$ = 0.05. There is not a significant difference between the variances of the two sets of data. We will need to use student's t-test, which is designed for equal variances, and the assumption of normality.
+
+####T-test
+```{r aque t test, echo=FALSE}
+aque_t_3 <- t.test(aque_2012_3$SIZE, aque_2017_3$SIZE, var.equal = TRUE) 
+aque_t_3
+```
+
+RESULT:  
+Mean Lobster Sizes do not differ significantly between the 2012 and 2017 at AQUE at significance level $\alpha$ = 0.05. (t(`r round(aque_t_3$parameter, 2)`) = `r round(aque_t_3$statistic, 2)`, *p* = `r aque_t_3$p.value`). 
+
+***
+##MOHK
+####Visual Data
+```{r MOHK, echo=FALSE}
+mohk_2012_3 <- sz_expand_3 %>% 
+  filter(SITE == "MOHK", YEAR == 2012) %>% 
+  ungroup() %>% 
+  select(SIZE)
+
+mohk_2017_3 <- sz_expand_3 %>% 
+  filter(SITE == "MOHK", YEAR == 2017) %>% 
+  ungroup() %>% 
+  select(SIZE)
+```
+
+<div class = "row">
+<div class = "col-md-6">
+2012
+```{r, echo=FALSE}
+ggqqplot(mohk_2012_3$SIZE)
+```
+</div>
+<div class = "col-md-6">
+2017
+```{r echo=FALSE}
+ggqqplot(mohk_2017_3$SIZE)
+```
+</div>
+</div>
+
+####F-test for variance 
+
+```{r mohk variance test, echo=FALSE}
+mohk_var_3<- var.test(mohk_2012_3$SIZE, mohk_2017_3$SIZE)
+mohk_var_3
+```
+RESULT:  
+p-value for the variance test, (`r mohk_var_3$p.value`) is larger than the significance level $\alpha$ = 0.05. There is not a significant difference between the variances of the two sets of data. We will need to use student's t-test, which is designed for equal variances, and the assumption of normality.
+
+###T-test
+
+```{r mohk t test, echo=FALSE}
+mohk_t_3 <- t.test(mohk_2012_3$SIZE, mohk_2017_3$SIZE, var.equal = TRUE) 
+mohk_t_3
+```
+RESULT:  
+Mean Lobster Sizes differ significantly between the 2012 and 2017 at MOHK at significance level $\alpha$ = 0.05. (t(`r round(mohk_t_3$parameter, 2)`) = `r round(mohk_t_3$statistic, 2)`, *p* = `r mohk_t_3$p.value`). 
+
+***
+##CARP
+####Visual Data
+```{r CARP, echo=FALSE}
+carp_2012_3 <- sz_expand_3 %>% 
+  filter(SITE == "CARP", YEAR == 2012) %>% 
+  ungroup() %>% 
+  select(SIZE)
+
+carp_2017_3 <- sz_expand_3 %>% 
+  filter(SITE == "CARP", YEAR == 2017) %>% 
+  ungroup() %>% 
+  select(SIZE)
 
 ```
 
-*gghistogram(npl_sz, x = "SIZE",
-   add = "mean", rug = TRUE,
-   color = "YEAR", fill = "YEAR",
-   palette = c("#00AFBB", "#E7B800"),
-   xlab = Lobster Size)*
+<div class = "row">
+<div class = "col-md-6">
+2012
+```{r, echo=FALSE}
+ggqqplot(carp_2012_3$SIZE)
+```
+</div>
+<div class = "col-md-6">
+2017
+```{r, echo=FALSE}
+ggqqplot(carp_2017_3$SIZE)
+```
+</div>
+</div>
+####F-test for variance 
 
-##t-test for change in mean lobster size at each site 
-###f-test: Do the two populations have the same variances?
+```{r CARP variance test, echo=FALSE}
+carp_var_3<- var.test(carp_2012_3$SIZE, carp_2017_3$SIZE)
+carp_var_3
+```
+RESULT:   
+p-value for the variance test, (`r carp_var_3$p.value`) is larger than the significance level $\alpha$ = 0.05. There is not a significant difference between the variances of the two sets of data. We will need to use student's t-test, which is designed for equal variances, and the assumption of normality.
 
-```{r}
-napl_ftest <- var.test(weight ~ group, data = npl_sz)
-napl_ftest
+####T-test 
+
+```{r carp t test, echo=FALSE}
+carp_t_3 <- t.test(carp_2012_3$SIZE, carp_2017_3$SIZE, var.equal = T) 
+carp_t_3
 ```
 
-
-```{r ivee comparison}
-lb_sz_mpa_ivee <- lb_sz_expand_12_17 %>% 
-  filter(SITE == "IVEE") %>% 
-  select(YEAR, SITE, SIZE)
-lb_sz_mpa_ivee 
-
-lb_sz_mpa_ivee_plot<-ggboxplot(lb_sz_mpa_ivee, x = "YEAR", y = "SIZE", 
-          color = "YEAR", palette = c("#00AFBB", "#E7B800"),
-        ylab = "SIZE", xlab = "YEAR")+
-  labs(title = "IVEE Lobster SIZE")
-lb_sz_mpa_ivee_plot
-```
-
-
+RESULT:  
+Mean Lobster Sizes do not differ significantly between the 2012 and 2017 at CARP at the 0.05 confidence level. (t(`r round(carp_t_3$parameter, 2)`) = `r round(carp_t_3$statistic, 2)`, *p* = `r carp_t_3$p.value`). 
 
 
