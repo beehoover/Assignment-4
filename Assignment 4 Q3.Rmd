@@ -93,8 +93,9 @@ size_sum_3 <- sz_expand_3 %>%
 
 size_sum_3%>%
   kable() %>%
-  kable_styling()
+  kable_styling() 
 ```
+
 ***
 ##IVEE (MPA)  
 
@@ -156,6 +157,12 @@ ivee_t_3
 RESULT:  
 Mean Lobster Sizes differ significantly between the 2012 and 2017 at IVEE at the 0.05 confidence level. (t(`r round(ivee_t_3$parameter, 2)`) = `r round(ivee_t_3$statistic, 2)`, *p* = `r ivee_t_3$p.value`).
 
+```{r ivee t test, echo=FALSE }
+ivee_t2_3 <- t.test(ivee_2012_3$SIZE, ivee_2017_3$SIZE, alternative = "less") 
+ivee_t2_3
+```
+RESULT:  
+Mean Lobster Sizes in 2012 is significantly smaller than in 2017 at IVEE at the 0.05 confidence level. (t(`r round(ivee_t2_3$parameter, 2)`) = `r round(ivee_t2_3$statistic, 2)`, *p* = `r ivee_t2_3$p.value`).
 
 ***
 ##NAPL (MPA)
@@ -308,7 +315,7 @@ mohk_var_3
 RESULT:  
 p-value for the variance test, (`r mohk_var_3$p.value`) is larger than the significance level $\alpha$ = 0.05. There is not a significant difference between the variances of the two sets of data. We will need to use student's t-test, which is designed for equal variances, and the assumption of normality.
 
-###T-test
+####T-test
 
 ```{r mohk t test, echo=FALSE}
 mohk_t_3 <- t.test(mohk_2012_3$SIZE, mohk_2017_3$SIZE, var.equal = TRUE) 
@@ -316,6 +323,13 @@ mohk_t_3
 ```
 RESULT:  
 Mean Lobster Sizes differ significantly between the 2012 and 2017 at MOHK at significance level $\alpha$ = 0.05. (t(`r round(mohk_t_3$parameter, 2)`) = `r round(mohk_t_3$statistic, 2)`, *p* = `r mohk_t_3$p.value`). 
+
+```{r mohk t test, echo=FALSE}
+mohk_t2_3 <- t.test(mohk_2012_3$SIZE, mohk_2017_3$SIZE, var.equal = TRUE, alternative = "greater") 
+mohk_t2_3
+```
+RESULT:  
+Mean Lobster Sizes in 2012 is significantly greater than in 2017at MOHK at significance level $\alpha$ = 0.05. (t(`r round(mohk_t2_3$parameter, 2)`) = `r round(mohk_t2_3$statistic, 2)`, *p* = `r mohk_t2_3$p.value`).
 
 ***
 ##CARP
