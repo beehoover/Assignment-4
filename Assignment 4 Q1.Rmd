@@ -27,9 +27,7 @@ library(vcdExtra)
 ###1.	Lobster abundance and fishing pressure (2012 - 2017)
 Describe trends in *lobster abundance (counts)* and *fishing pressure (trap buoys)* at the five locations from 2012 - 2017. Ignore transect information - we are only interested in evaluating abundance and pressure on the order of SITE. Note: you are not expected to use regression here - just think of ways to clearly describe annual totals visually and in text, noting important trends, events and differences.
 
-```{r}
-
-
+```{r reading in data}
 lobster_traps <- read_csv("lobster_traps.csv")
 lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
 ```
@@ -37,7 +35,7 @@ lobster_size_abundance <- read_csv("lobster_size_abundance.csv")
 #1.Describe Lobster Abundance and Fishing Pressure (2012-2017)
 ##Lobster Abundance
 ```{r dataset lobster count by year and site}
-library(plyr)
+##library(plyr)
 lb_count_month_year<- lobster_size_abundance %>%
   filter(SITE == "AQUE" | SITE == "CARP" | SITE == "IVEE" | SITE == "MOHK" | SITE == "NAPL") %>%
   group_by(SITE, YEAR) %>%

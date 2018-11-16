@@ -1,5 +1,5 @@
 ---
-title: "Assignment 4 Q5"
+title: "Assignment 4 Q4"
 author: "Barbara Rose Hoover"
 date: "11/13/2018"
 output: html_document
@@ -52,6 +52,7 @@ sz_expand_5$Count.Not.Legal<-as.integer(sz_expand_5$Count.Not.Legal)
 
 sz_expand_5
 ```
+
 ```{r}
 sz_ratio_5<- sz_expand_5 %>%
     group_by(SITE) %>% 
@@ -82,3 +83,5 @@ sz_chi_5$observed
 round(sz_chi_5$expected,2)
 round(sz_chi_5$residuals, 3)
 ```
+
+
