@@ -59,7 +59,7 @@ lb_sz_sum_2 <- summarySE(data=sz_expand_2,
           conf.interval = 0.95)
 lb_sz_sum_2 
 ```
-
+####Box Plot of Lobster Size Distribution 
 ```{r data visualization}
 sz_bplot_2<-ggboxplot(sz_expand_2, x = "SITE", y = "SIZE", 
           color = "SITE", palette = get_palette(c("#00AFBB", "#E7B800", "#FC4E07"), 5),
@@ -67,7 +67,7 @@ sz_bplot_2<-ggboxplot(sz_expand_2, x = "SITE", y = "SIZE",
           ylab = "SIZE", xlab = "SITE")
 sz_bplot_2
 ```
-
+####Histogram Representation of Lobster Size Distribution with Means (Totally Unnecessary- It's just pretty)
 ```{r}
 sz_hst_2<-gghistogram(sz_expand_2, x = "SIZE",
    add = "mean", rug = TRUE,
@@ -86,9 +86,10 @@ z<-anova(lb.aov)
 summary(lb.aov)
 summary(z)
 ```
-###As the ANOVA test is significant, we can compute Tukey HSD (Tukey Honest Significant Differences, R function: TukeyHSD()) for performing multiple pairwise-comparison between the means of groups.
+####As the ANOVA test is significant, we can compute Tukey HSD (Tukey Honest Significant Differences, R function: TukeyHSD()) for performing multiple pairwise-comparison between the means of groups.
 
-####The function TukeyHD() takes the fitted ANOVA as an argument.
+#####NOTE:  
+#####The function TukeyHD() takes the fitted ANOVA as an argument.
 ```{r}
 TukeyHSD(lb.aov)
 ```
@@ -96,8 +97,10 @@ TukeyHSD(lb.aov)
 
 NAPL-IVEE  4.7799976  1.09751057 8.462485 0.0037001  
 
-NAPL-CARP  4.0023556  0.36042398 7.644287 0.0228728 
-####Very close to the significance level. Need to think about this in discussion. 
+NAPL-CARP  4.0023556  0.36042398 7.644287 0.0228728  
+
+####Very close to the significance level. Need to think about this in discussion.  
+
 NAPL-MOHK  4.2321429 -0.08607271 8.550358 0.0579286
 
 ```{r}
@@ -109,16 +112,16 @@ library(agricolae)
 lb_sz_sum_2
 
 ```{r}
-offset.v = -3     # offsets for mean letters
-offset.h = 0.5
+offset.v = -4     # offsets for mean letters
+offset.h = 0.6
 
 ggplot(lb_sz_sum_2, 
        aes(x = SITE, y = SIZE, 
            ymax=85, ymin=0.0))  +
        geom_bar(stat="identity", fill="gray50",
            colour = "black", width = 0.7)  +
-       geom_errorbar(aes(ymax=SIZE+se, ymin=SIZE-se), 
-                     width=0.0, size=0.5, color="black")  +
+       geom_errorbar(aes(ymax=SIZE+sd, ymin=SIZE-sd), 
+                     width=0.3, size=0.5, color="black")  +
        geom_text(aes(label=c("ab","b","b","b","a"),
                  hjust=offset.h, vjust=offset.v)) +              
        labs(x = "Sample location", 
