@@ -2,7 +2,9 @@
 title: "Assignment 4 Q1"
 author: "Barbara Rose Hoover"
 date: "11/8/2018"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -89,4 +91,6 @@ fishing_pressure_plot<-ggplot(fishing_pressure_year, aes(factor(YEAR), TRAPS, gr
    ylab("Trap Count")+
   labs(title = "Lobster Fishing Pressure")
 fishing_pressure_plot
+
+quartz(fishing_pressure_plot)
 ```
