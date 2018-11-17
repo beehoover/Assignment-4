@@ -112,12 +112,12 @@ library(agricolae)
 lb_sz_sum_2
 
 ```{r}
-offset.v = -4     # offsets for mean letters
+offset.v = -5     # offsets for mean letters
 offset.h = 0.6
 
 ggplot(lb_sz_sum_2, 
        aes(x = SITE, y = SIZE, 
-           ymax=85, ymin=0.0))  +
+           ymax=90, ymin=0.0))  +
        geom_bar(stat="identity", fill="gray50",
            colour = "black", width = 0.7)  +
        geom_errorbar(aes(ymax=SIZE+sd, ymin=SIZE-sd), 
@@ -126,7 +126,7 @@ ggplot(lb_sz_sum_2,
                  hjust=offset.h, vjust=offset.v)) +              
        labs(x = "Sample location", 
             y = "Mean Size (mm)",
-            caption = "Bar plot of means for each SITE of a one-way analysis of variance (ANOVA).  Error indicates standard error of the mean.  Bars sharing the same letter are not significantly different according to Tukey’s HSD test.")  +
+            caption = "Bar plot of means for each SITE of a one-way analysis of variance (ANOVA).  Error indicates standard diviation of the mean.  Bars sharing the same letter are not significantly different according to Tukey’s HSD test.")  +
        ggtitle("Mean Lobster Size (mm) by Location
                ") + 
        theme_bw()  +
