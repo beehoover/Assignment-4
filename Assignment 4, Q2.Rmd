@@ -125,10 +125,8 @@ ggplot(lb_sz_sum_2,
        geom_text(aes(label=c("ab","b","b","b","a"),
                  hjust=offset.h, vjust=offset.v)) +              
        labs(x = "Sample location", 
-            y = "Mean Size (mm)",
-            caption = "Bar plot of means for each SITE of a one-way analysis of variance (ANOVA).  Error indicates standard diviation of the mean.  Bars sharing the same letter are not significantly different according to Tukey’s HSD test.")  +
-       ggtitle("Mean Lobster Size (mm) by Location
-               ") + 
+            y = "Mean Size (mm)")  +
+       ggtitle("Mean Lobster Size (mm) by Location") + 
        theme_bw()  +
        theme(panel.grid.major.x = element_blank(),
              panel.grid.major.y = element_line(colour = "grey80"),
